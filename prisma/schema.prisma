@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id            String      @id @default(uuid())
+  name          String
+  email         String      @unique
+  password      String
+  image         String?
+  role          Role        @default(USER)
+  files         File[]
+  sharedFiles   FileShare[]
+  active        Boolean      @default(true)
+  resetToken    Int?
+  resetTokenExpire DateTime? 
+  subscribedAt  DateTime    @default(now())
+  validDays     Int         @default(7)
+  totalStorage  Int         @default(10)
+  uploadSpeed   Float       @default(10)
+  downloadSpeed Float       @default(10)
+
+  payments      Payment[] 
+
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model File {
+  id            String      @id @default(uuid())
+  name          String
+  size          Int
+  type          String
+  path          String
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  visibility    Visibility @default(PRIVATE)
+  private       Boolean
+  trash         Trash[]
+  fileShares    FileShare[]
+  
+
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model Trash {
+  id        String   @id @default(uuid())
+  fileId    String
+  file      File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  deletedAt DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model FileShare {
+  id        String   @id @default(uuid())
+  fileId    String
+  userId    String
+  file      File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sharedAt  DateTime @default(now())
+  email     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([fileId, email]) 
+}
+
+model Payment {
+  id            String    @id @default(uuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount        Float
+  paymentDate   DateTime  @default(now())
+  paymentMethod String
+  status        String?
+  transactionId String?
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+
+model Pricing {
+  id                String   @id @default(uuid())
+  perGbStoragePrice Float    @default(0.1) 
+  perDayPrice       Float    @default(0.05) 
+  perMbpsSpeedPrice Float    @default(0.02) 
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+
+enum Visibility {
+  PUBLIC
+  PRIVATE
+  SHARED
+}
+
+enum Role {
+  ADMIN
+  USER
+}

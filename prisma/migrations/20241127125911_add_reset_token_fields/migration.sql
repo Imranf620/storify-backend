@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "User" ADD COLUMN     "resetToken" INTEGER,
+ADD COLUMN     "resetTokenExpire" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;

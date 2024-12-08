@@ -1,0 +1,11 @@
+-- CreateTable
+CREATE TABLE "Pricing" (
+    "id" TEXT NOT NULL,
+    "perGbStoragePrice" DOUBLE PRECISION NOT NULL DEFAULT 0.1,
+    "perDayPrice" DOUBLE PRECISION NOT NULL DEFAULT 0.05,
+    "perMbpsSpeedPrice" DOUBLE PRECISION NOT NULL DEFAULT 0.02,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Pricing_pkey" PRIMARY KEY ("id")
+);
